@@ -9,19 +9,65 @@ if (!localStorage.getItem("state")) {
   localStorage.setItem("state", state);
 } else {
   state = localStorage.getItem("state");
-  console.log("The state is: " + state);
 }
 
 if (!localStorage.getItem("users")) {
   let users = [];
   users = [{ username: "janne", password: "test" }];
   localStorage.setItem("users", JSON.stringify(users));
-  console.log(localStorage.getItem("users"));
-  console.log(JSON.parse(localStorage.getItem("users")));
-} else {
-  let users = localStorage.getItem("users");
-  console.log("I LS", users);
 }
+
+const checkPassword = (password) => {
+
+  let specialCharsCount = 0;
+  const specialChars = [
+    "@", "$", "%", "*", "^", "<", ">", "?", "!", "(", ")", "[", "]", "{", "}", "'"
+  ];
+
+  specialChars.forEach((value, index) => {
+    const specialChar = specialChars[index];
+    if (password.includes(specialChar)) {
+      specialCharsCount++;
+    }
+  });
+  if (password.length >= 6 && specialCharsCount >= 2 ||
+    password.length >= 8 && specialCharsCount >= 1 ||
+    password.length >= 12 && password.includes("-") ||
+    password.length >= 16) {
+    errorBoxNewPassword.innerHTML = "";
+    return true;
+  }
+  else {
+    const ErrorMessagePassword = "Password not strong enough, try again! <br> Password needs to be at least 6 characters long and include at least 2 <br> unique special characters from the following list: @ $ % * ^ < > ? ! ( ) [ ] { } '"
+    errorBoxNewPassword.innerHTML = ErrorMessagePassword;
+    return false;
+  }
+};
+
+function newUserNameLengthCheck(newUserName, minlength, maxlength) {
+  let mnlen = minlength;
+  let mxlen = maxlength;
+
+  if (newUserName.value.length < mnlen || newUserName.value.length > mxlen) {
+    errorBoxNewUserName.innerHTML = ("Username needs to be " + mnlen + " to " + mxlen + " characters.");
+    return false;
+  }
+  else {
+    errorBoxNewUserName.innerHTML = "";
+    return true;
+  }
+}
+
+function checkIfUsersExists(newUserName) {
+  let users = JSON.parse(localStorage.getItem("users"));
+  if (users.find(user => user.username === newUserName)) {
+    errorBoxUserExists.innerHTML = "Username already exists, try another one!";
+    return false;
+  } else {
+    errorBoxUserExists.innerHTML = "";
+    return true;
+  }
+};
 
 function printPage(state) {
   switch (state) {
@@ -36,10 +82,8 @@ function printPage(state) {
       `;
       iWantToCreateAnAccountBtn = document.getElementById("iWantToCreateAnAccountBtn")
       iWantToCreateAnAccountBtn.addEventListener("click", () => {
-        console.log("click on iWantToCreateAnAccountBtn");
         state = "createNewUser"
         localStorage.setItem("state", state);
-        console.log("state = " + localStorage.getItem("state"))
         printPage(state);
         printHeader(state);
       });
@@ -66,14 +110,11 @@ function printPage(state) {
       <button id="iGiveUpGiveMeANewAccount">I give up, give me a new account</button>
       </div>
       `;
-
       iGiveUpGiveMeANewAccount.addEventListener("click", () => {
-        console.log("click on iGiveUpGiveMeANewAccountBtn");
         state = "createNewUser"
         localStorage.setItem("state", state);
         printPage(state);
         printHeader(state);
-        console.log("state = " + localStorage.getItem("state"));
       });
       break;
 
@@ -93,32 +134,41 @@ function printPage(state) {
           </div>
           <br>
           <button type="submit" id="createNewAccountBtn">Create New Account</button>
-      </form> 
+      </form>
+      <div id="errorBox">
+      <div id="errorBoxUserExists"></div>
+      <div id="errorBoxNewUserName"></div> 
+      <div id="errorBoxNewPassword"></div> 
+      </div>
             `;
-      // createNewAccountBtn = document.getElementById("createNewAccountBtn")
       createNewAccountBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        console.log("click on createNewAccountBtn");
-        //Push new user to LocalStorage
-        let newUser = {
-          username: newUserName.value,
-          password: newUserPassword.value
-        }
-        let users = [];
-        users = JSON.parse(localStorage.getItem("users"));
-        // console.log(users);
-        users.push(newUser);
+        if (checkIfUsersExists(newUserName.value) && newUserNameLengthCheck(newUserName, 4, 10) && checkPassword(newUserPassword.value)) {
+          //Push new user to LocalStorage
+          let newUser = {
+            username: newUserName.value,
+            password: newUserPassword.value
+          }
+          let users = [];
+          users = JSON.parse(localStorage.getItem("users"));
+          users.push(newUser);
 
-        //Change state
-        localStorage.setItem("users", JSON.stringify(users));
-        state = "unknown"
-        localStorage.setItem("state", state);
-        console.log("state = " + localStorage.getItem("state"));
-        printPage(state);
-        printHeader(state);
+          //Change state
+          localStorage.setItem("users", JSON.stringify(users));
+          state = "unknown";
+          localStorage.setItem("state", state);
+          printPage(state);
+          printHeader(state);
+
+        } else {
+          // createNewUserForm.reset();
+          newUserNameLengthCheck(newUserName, 4, 10);
+          checkPassword(newUserPassword.value);
+          checkIfUsersExists(newUserName.value);
+        }
       });
-  }
-}
+  };
+};
 
 function printHeader(state) {
   if (state !== "logInSuccess") {
@@ -138,22 +188,17 @@ function printHeader(state) {
     `
     logInBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("click on LogInBtn");
-
       let users = [];
       users = JSON.parse(localStorage.getItem("users"));
       let logInResultSuccess = users.find(user => user.username === userName.value && user.password === userPassword.value);
 
       if (logInResultSuccess) {
-        console.log("result", "success!");
         state = "logInSuccess"
         localStorage.setItem("state", state);
         currentUser = userName.value;
-        console.log("state = " + localStorage.getItem("state"));
         printPage(state);
         printHeader(state);
       } else {
-        console.log("result", "fail!");
         state = "failedLogInAttempt";
         localStorage.setItem("state", state);
         printPage(state);
@@ -170,14 +215,12 @@ function printHeader(state) {
 
       state = "unknown"
       localStorage.setItem("state", state);
-      console.log("state = " + localStorage.getItem("state"));
       printPage(state);
       printHeader(state);
 
     });
   };
-}
+};
 
 printPage(state);
 printHeader(state);
-
