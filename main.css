@@ -1,5 +1,7 @@
 body {
     background-color: #FAFAFA;
+    font-family: monospace;
+    font-weight: bold;
 }
 
 header {
@@ -20,6 +22,24 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+button {
+    background-color: #EB5757;
+    padding: 10px;
+    font-weight: bold;
+}
+
+button:active {
+    box-shadow: 2px 2px black;
+}
+
+q {
+    font-size: 1rem;
+    color: #EB5757;
+    padding: 50px;
+    font-weight: bold;
+
 }
 
 #contentDiv {
