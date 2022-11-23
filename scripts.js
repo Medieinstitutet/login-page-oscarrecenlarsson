@@ -1,53 +1,30 @@
-headerDiv = document.getElementById("headerDiv");
-contentDiv = document.getElementById("contentDiv");
+"use strict"
+
+import checkPassword from "./modules/checkPassword.mjs";
+
+const headerDiv = document.getElementById("headerDiv");
+const contentDiv = document.getElementById("contentDiv");
 
 let currentUser = "";
 let state = "";
 
 if (!localStorage.getItem("state")) {
-  let state = "unknown";
+  state = "unknown";
   localStorage.setItem("state", state);
 } else {
   state = localStorage.getItem("state");
-}
+};
 
 if (!localStorage.getItem("users")) {
   let users = [];
-  users = [{ username: "janne", password: "test" }];
+  users = [{ username: "janne", password: "test" }, { username: "oscar", password: "1234" }, { username: "kalle", password: "asdf" }];
   localStorage.setItem("users", JSON.stringify(users));
-}
-
-const checkPassword = (password) => {
-
-  let specialCharsCount = 0;
-  const specialChars = [
-    "@", "$", "%", "*", "^", "<", ">", "?", "!", "(", ")", "[", "]", "{", "}", "'"
-  ];
-
-  specialChars.forEach((value, index) => {
-    const specialChar = specialChars[index];
-    if (password.includes(specialChar)) {
-      specialCharsCount++;
-    }
-  });
-  if (password.length >= 6 && specialCharsCount >= 2 ||
-    password.length >= 8 && specialCharsCount >= 1 ||
-    password.length >= 12 && password.includes("-") ||
-    password.length >= 16) {
-    errorBoxNewPassword.innerHTML = "";
-    return true;
-  }
-  else {
-    const ErrorMessagePassword = "Password not strong enough, try again! <br> Password needs to be at least 6 characters long and include at least 2 <br> unique special characters from the following list: @ $ % * ^ < > ? ! ( ) [ ] { } '"
-    errorBoxNewPassword.innerHTML = ErrorMessagePassword;
-    return false;
-  }
 };
 
 function newUserNameLengthCheck(newUserName, minlength, maxlength) {
   let mnlen = minlength;
   let mxlen = maxlength;
-
+  let errorBoxNewUserName = document.getElementById("errorBoxNewUserName");
   if (newUserName.value.length < mnlen || newUserName.value.length > mxlen) {
     errorBoxNewUserName.innerHTML = ("Username needs to be " + mnlen + " to " + mxlen + " characters.");
     return false;
@@ -60,6 +37,7 @@ function newUserNameLengthCheck(newUserName, minlength, maxlength) {
 
 function checkIfUsersExists(newUserName) {
   let users = JSON.parse(localStorage.getItem("users"));
+  let errorBoxUserExists = document.getElementById("errorBoxUserExists");
   if (users.find(user => user.username === newUserName)) {
     errorBoxUserExists.innerHTML = "Username already exists, try another one!";
     return false;
@@ -71,7 +49,7 @@ function checkIfUsersExists(newUserName) {
 
 function printPage(state) {
   switch (state) {
-    default:
+    default: {
       contentDiv.innerHTML = `
       <h2>You need to log in to see the page. </h2>
       <p>Use the form in the upper right hand corner of the screen to log in.<br>
@@ -80,7 +58,7 @@ function printPage(state) {
       <br>
       <button id="iWantToCreateAnAccountBtn">I want to create an account</button>
       `;
-      iWantToCreateAnAccountBtn = document.getElementById("iWantToCreateAnAccountBtn")
+      let iWantToCreateAnAccountBtn = document.getElementById("iWantToCreateAnAccountBtn")
       iWantToCreateAnAccountBtn.addEventListener("click", () => {
         state = "createNewUser"
         localStorage.setItem("state", state);
@@ -88,19 +66,19 @@ function printPage(state) {
         printHeader(state);
       });
       break;
-
-    case "logInSuccess":
-
+    }
+    case "logInSuccess": {
+      currentUser = localStorage.getItem("currentUser");
       contentDiv.innerHTML = `
       <h2>Welcome to the page ${currentUser}!</h2>
       <p>You have successfully logged in and are now able to enjoy this custom quote.</p>
       <q>Wake up, ${currentUser}... <br> The Matrix has you... <br> Follow the white rabbit. 
       <br><br><br>
       Knock, knock, ${currentUser}.
-      `
+      `;
       break;
-
-    case "failedLogInAttempt":
+    }
+    case "failedLogInAttempt": {
       contentDiv.innerHTML = `
       <div id="errorMessage">
       <h2>Wrong Credentials</h2>
@@ -110,6 +88,7 @@ function printPage(state) {
       <button id="iGiveUpGiveMeANewAccount">I give up, give me a new account</button>
       </div>
       `;
+      let iGiveUpGiveMeANewAccount = document.getElementById("iGiveUpGiveMeANewAccount");
       iGiveUpGiveMeANewAccount.addEventListener("click", () => {
         state = "createNewUser"
         localStorage.setItem("state", state);
@@ -117,8 +96,8 @@ function printPage(state) {
         printHeader(state);
       });
       break;
-
-    case "createNewUser":
+    }
+    case "createNewUser": {
       contentDiv.innerHTML = `
       <h2>Create Account</h2>
       <br><br>
@@ -141,6 +120,9 @@ function printPage(state) {
       <div id="errorBoxNewPassword"></div> 
       </div>
             `;
+      let createNewAccountBtn = document.getElementById("createNewAccountBtn");
+      let newUserName = document.getElementById("newUserName");
+      let newUserPassword = document.getElementById("newUserPassword");
       createNewAccountBtn.addEventListener("click", (e) => {
         e.preventDefault();
         if (checkIfUsersExists(newUserName.value) && newUserNameLengthCheck(newUserName, 4, 10) && checkPassword(newUserPassword.value)) {
@@ -165,8 +147,9 @@ function printPage(state) {
           newUserNameLengthCheck(newUserName, 4, 10);
           checkPassword(newUserPassword.value);
           checkIfUsersExists(newUserName.value);
-        }
+        };
       });
+    }
   };
 };
 
@@ -186,6 +169,9 @@ function printHeader(state) {
       <button type="submit" id="logInBtn">Log In</button>
     </form>
     `
+    let logInBtn = document.getElementById("logInBtn");
+    let userName = document.getElementById("userName");
+    let userPassword = document.getElementById("userPassword");
     logInBtn.addEventListener("click", (e) => {
       e.preventDefault();
       let users = [];
@@ -193,9 +179,10 @@ function printHeader(state) {
       let logInResultSuccess = users.find(user => user.username === userName.value && user.password === userPassword.value);
 
       if (logInResultSuccess) {
-        state = "logInSuccess"
+        state = "logInSuccess";
         localStorage.setItem("state", state);
         currentUser = userName.value;
+        localStorage.setItem("currentUser", currentUser);
         printPage(state);
         printHeader(state);
       } else {
@@ -207,17 +194,18 @@ function printHeader(state) {
     });
 
   } else {
+    currentUser = localStorage.getItem("currentUser");
     headerDiv.innerHTML = `
       <p>You are logged in as: ${currentUser}</p>
       <button id="logOutBtn">Log Out</button>
       `
+    let logOutBtn = document.getElementById("logOutBtn");
     logOutBtn.addEventListener("click", () => {
 
       state = "unknown"
       localStorage.setItem("state", state);
       printPage(state);
       printHeader(state);
-
     });
   };
 };
