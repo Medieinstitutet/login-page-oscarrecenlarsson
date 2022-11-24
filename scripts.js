@@ -55,12 +55,11 @@ function checkIfUsersExists(newUserName) {
   }
 };
 
-
 // Main function to display content in the "contentDiv" based on what state the page is in
 function printPage(state) {
   switch (state) {
-    default: {
-      console.log("HEJ från default");
+    case "unknown": {
+      // console.log("hi from unkown");
       contentDiv.innerHTML = `
       <h2>You need to log in to see the page. </h2>
       <p>Use the form in the upper right hand corner of the screen to log in.<br>
@@ -79,7 +78,7 @@ function printPage(state) {
       break;
     }
     case "logInSuccess": {
-      console.log("HEJ från logInSuccess");
+      // console.log("Hi from logInSuccess");
       currentUser = localStorage.getItem("currentUser");
       contentDiv.innerHTML = `
       <h2>Welcome to the page ${currentUser}!</h2>
@@ -91,7 +90,7 @@ function printPage(state) {
       break;
     }
     case "failedLogInAttempt": {
-      console.log("HEJ från failedLogInAttempt");
+      // console.log("Hi from failedLogInAttempt");
       contentDiv.innerHTML = `
       <div id="errorMessage">
       <h2>Wrong Credentials</h2>
@@ -111,7 +110,7 @@ function printPage(state) {
       break;
     }
     case "createNewUser": {
-      console.log("HEJ från CreateNewUser");
+      // console.log("Hi from CreateNewUser");
       contentDiv.innerHTML = `
       <h2>Create Account</h2>
       <br><br>
@@ -137,6 +136,7 @@ function printPage(state) {
       let createNewAccountBtn = document.getElementById("createNewAccountBtn");
       let newUserName = document.getElementById("newUserName");
       let newUserPassword = document.getElementById("newUserPassword");
+
       createNewAccountBtn.addEventListener("click", (e) => {
         e.preventDefault();
         //If username and password input match conditions to create new user, push new user to LocalStorage
@@ -163,6 +163,10 @@ function printPage(state) {
           checkIfUsersExists(newUserName.value);
         };
       });
+      break;
+    }
+    default: {
+      console.log("Something is wrong with the state/switch");
     }
   };
 };
