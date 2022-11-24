@@ -7,17 +7,24 @@ const contentDiv = document.getElementById("contentDiv");
 const logoDiv = document.getElementById("logoDiv");
 
 let currentUser = "";
-let state = "";
+let state = "unknown";
+let users = [];
 
+// Check if a state i saved if local storage, 
+// if not, save default state to local storage and print the page based on the default state.
+// If a state is already in local storage print the page based on that state.
 if (!localStorage.getItem("state")) {
-  state = "unknown";
   localStorage.setItem("state", state);
+  printPage(state);
+  printHeader(state);
 } else {
   state = localStorage.getItem("state");
+  printPage(state);
+  printHeader(state);
 };
 
+// Check if any users are stored in local storage, if not, set up a set of default users and store them in local storage.
 if (!localStorage.getItem("users")) {
-  let users = [];
   users = [{ username: "janne", password: "test" }, { username: "oscar", password: "1234" }, { username: "kalle", password: "asdf" }];
   localStorage.setItem("users", JSON.stringify(users));
 };
@@ -48,9 +55,12 @@ function checkIfUsersExists(newUserName) {
   }
 };
 
+
+// Main function to display content in the "contentDiv" based on what state the page is in
 function printPage(state) {
   switch (state) {
     default: {
+      console.log("HEJ från default");
       contentDiv.innerHTML = `
       <h2>You need to log in to see the page. </h2>
       <p>Use the form in the upper right hand corner of the screen to log in.<br>
@@ -59,9 +69,9 @@ function printPage(state) {
       <br>
       <button id="iWantToCreateAnAccountBtn">I want to create an account</button>
       `;
-      let iWantToCreateAnAccountBtn = document.getElementById("iWantToCreateAnAccountBtn")
+      let iWantToCreateAnAccountBtn = document.getElementById("iWantToCreateAnAccountBtn");
       iWantToCreateAnAccountBtn.addEventListener("click", () => {
-        state = "createNewUser"
+        state = "createNewUser";
         localStorage.setItem("state", state);
         printPage(state);
         printHeader(state);
@@ -69,6 +79,7 @@ function printPage(state) {
       break;
     }
     case "logInSuccess": {
+      console.log("HEJ från logInSuccess");
       currentUser = localStorage.getItem("currentUser");
       contentDiv.innerHTML = `
       <h2>Welcome to the page ${currentUser}!</h2>
@@ -80,6 +91,7 @@ function printPage(state) {
       break;
     }
     case "failedLogInAttempt": {
+      console.log("HEJ från failedLogInAttempt");
       contentDiv.innerHTML = `
       <div id="errorMessage">
       <h2>Wrong Credentials</h2>
@@ -91,21 +103,15 @@ function printPage(state) {
       `;
       let iGiveUpGiveMeANewAccount = document.getElementById("iGiveUpGiveMeANewAccount");
       iGiveUpGiveMeANewAccount.addEventListener("click", () => {
-        state = "createNewUser"
+        state = "createNewUser";
         localStorage.setItem("state", state);
         printPage(state);
         printHeader(state);
       });
-
-      logoDiv.addEventListener("click", () => {
-        console.log("click!");
-        state = "unknown"
-        localStorage.setItem("state", state);
-        printPage(state);
-      });
       break;
     }
     case "createNewUser": {
+      console.log("HEJ från CreateNewUser");
       contentDiv.innerHTML = `
       <h2>Create Account</h2>
       <br><br>
@@ -133,35 +139,29 @@ function printPage(state) {
       let newUserPassword = document.getElementById("newUserPassword");
       createNewAccountBtn.addEventListener("click", (e) => {
         e.preventDefault();
+        //If username and password input match conditions to create new user, push new user to LocalStorage
         if (checkIfUsersExists(newUserName.value) && newUserNameLengthCheck(newUserName, 4, 10) && checkPassword(newUserPassword.value)) {
-          //Push new user to LocalStorage
           let newUser = {
             username: newUserName.value,
             password: newUserPassword.value
           }
-          let users = [];
           users = JSON.parse(localStorage.getItem("users"));
           users.push(newUser);
-
-          //Change state
           localStorage.setItem("users", JSON.stringify(users));
+
+          // Go back to "start page"
           state = "unknown";
           localStorage.setItem("state", state);
           printPage(state);
           printHeader(state);
 
         } else {
+          // Run conditions to display the errors that caused the if statement to fail
           // createNewUserForm.reset();
           newUserNameLengthCheck(newUserName, 4, 10);
           checkPassword(newUserPassword.value);
           checkIfUsersExists(newUserName.value);
         };
-      });
-      logoDiv.addEventListener("click", () => {
-        console.log("click!");
-        state = "unknown"
-        localStorage.setItem("state", state);
-        printPage(state);
       });
     }
   };
@@ -186,9 +186,9 @@ function printHeader(state) {
     let logInBtn = document.getElementById("logInBtn");
     let userName = document.getElementById("userName");
     let userPassword = document.getElementById("userPassword");
+
     logInBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      let users = [];
       users = JSON.parse(localStorage.getItem("users"));
       let logInResultSuccess = users.find(user => user.username === userName.value && user.password === userPassword.value);
 
@@ -224,5 +224,12 @@ function printHeader(state) {
   };
 };
 
-printPage(state);
-printHeader(state);
+// Navigate to start page by clicking on "Enter the Matrix"
+logoDiv.addEventListener("click", () => {
+
+  if (localStorage.getItem("state") !== "logInSuccess") {
+    state = "unknown";
+    localStorage.setItem("state", state);
+    printPage(state);
+  }
+});
