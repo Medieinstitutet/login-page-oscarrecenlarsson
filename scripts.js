@@ -4,6 +4,7 @@ import checkPassword from "./modules/checkPassword.mjs";
 
 const headerDiv = document.getElementById("headerDiv");
 const contentDiv = document.getElementById("contentDiv");
+const logoDiv = document.getElementById("logoDiv");
 
 let currentUser = "";
 let state = "";
@@ -95,6 +96,13 @@ function printPage(state) {
         printPage(state);
         printHeader(state);
       });
+
+      logoDiv.addEventListener("click", () => {
+        console.log("click!");
+        state = "unknown"
+        localStorage.setItem("state", state);
+        printPage(state);
+      });
       break;
     }
     case "createNewUser": {
@@ -148,6 +156,12 @@ function printPage(state) {
           checkPassword(newUserPassword.value);
           checkIfUsersExists(newUserName.value);
         };
+      });
+      logoDiv.addEventListener("click", () => {
+        console.log("click!");
+        state = "unknown"
+        localStorage.setItem("state", state);
+        printPage(state);
       });
     }
   };

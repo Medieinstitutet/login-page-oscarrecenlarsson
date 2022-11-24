@@ -57,6 +57,10 @@ q {
     gap: 20px;
 }
 
+#logoDiv {
+    cursor: pointer;
+}
+
 #errorMessage h2 {
     color: red;
 }
