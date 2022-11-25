@@ -18,7 +18,7 @@ header {
 
 h2 {
     margin-top: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 footer {
@@ -44,7 +44,7 @@ button:active {
 q {
     font-size: 1rem;
     color: #EB5757;
-    padding-top: 50px;
+    padding-top: 30px;
     font-weight: bold;
 
 }
@@ -77,6 +77,10 @@ q {
     color: red;
 }
 
+#errorMessage p {
+    margin-bottom: 20px;
+}
+
 #errorBox {
     color: red;
     text-align: center;
@@ -100,6 +104,10 @@ q {
         align-items: center;
         flex-direction: column;
         gap: 10px;
+    }
+
+    #errorMessage {
+        text-align: center;
     }
 
     q {
