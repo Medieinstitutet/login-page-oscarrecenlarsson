@@ -113,7 +113,7 @@ function printPage(state) {
       // console.log("Hi from CreateNewUser");
       contentDiv.innerHTML = `
       <h2>Create Account</h2>
-      <br><br>
+     
       <form id="createNewUserForm">
           <div class="inputField">
               <label for="newUserName">Username:</label><br>
